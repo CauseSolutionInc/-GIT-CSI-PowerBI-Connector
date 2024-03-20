@@ -121,12 +121,12 @@
     <value>Connection</value>
   </data>
   <data name="ConnectorName" xml:space="preserve">
-    <value>CauseSolution</value>
+    <value>Cause and Solution, Inc.</value>
   </data>
   <data name="ConnectorTooltip" xml:space="preserve">
-    <value>Connect to Blackbaud via Cause and Solution</value>
+    <value>Connect to Blackbaud via Cause and Solution, Inc.</value>
   </data>
   <data name="DataSourceLabel" xml:space="preserve">
-    <value>Connect to your Cause and Solution Blackbaud environment</value>
+    <value>Connect to your Cause and Solution, Inc. Blackbaud environment</value>
   </data>
 </root>

@@ -1,17 +1,17 @@
-// ---------------------------------------------------------------
+﻿// ---------------------------------------------------------------
 // This file contains the Blackbaud Power BI connector definition
 // ---------------------------------------------------------------
 //
-section CauseSolution;
+section Blackbaud;
 
 // Data source description
-[DataSource.Kind="CauseSolution", Publish="CauseSolution.Publish"]
-shared CauseSolution.Contents = () => GetNavigationTable();
+[DataSource.Kind="Blackbaud", Publish="Blackbaud.Publish"]
+shared Blackbaud.Contents = () => GetNavigationTable();
 
 // Data source Kind description
-CauseSolution = [
+Blackbaud = [
     // TestConnection is required to enable the connector through the Gateway
-    TestConnection = (dataSourcePath) => { "CauseSolution.Contents" },
+    TestConnection = (dataSourcePath) => { "Blackbaud.Contents" },
 
     // Describe the API Authorization implementation
     Authentication = [
@@ -26,16 +26,16 @@ CauseSolution = [
 ];
 
 // Data Source UI publishing description
-CauseSolution.Publish = [
+Blackbaud.Publish = [
     Beta = false,
     Category = "Other",
     ButtonText = { Extension.LoadString("ConnectorName"), Extension.LoadString("ConnectorTooltip") },
     LearnMoreUrl = "https://docs.blackbaud.com/microsoft-connectors-docs/microsoft-power-platform",
-    SourceImage = CauseSolution.Icons,
-    SourceTypeImage = CauseSolution.Icons
+    SourceImage = Blackbaud.Icons,
+    SourceTypeImage = Blackbaud.Icons
 ];
 
-CauseSolution.Icons = [
+Blackbaud.Icons = [
     Icon16 = { Extension.Contents("CauseSolution16.png"), Extension.Contents("CauseSolution20.png"), Extension.Contents("CauseSolution24.png"), Extension.Contents("CauseSolution32.png") },
     Icon32 = { Extension.Contents("CauseSolution32.png"), Extension.Contents("CauseSolution40.png"), Extension.Contents("CauseSolution48.png"), Extension.Contents("CauseSolution64.png") }
 ];
@@ -441,7 +441,7 @@ NXTNavTable = (branch as text) as table =>
 CreateListsNavTable = (listType as text, public as logical, listHandler as function) as table => 
     let
         url = Uri.Combine(BaseUrl, "list/v1/lists?list_type=" & listType),
-        data = CauseSolution.Feed(url, true, ListOfListsType, 0),
+        data = Blackbaud.Feed(url, true, ListOfListsType, 0),
         appliedSchema = Table.ChangeType(data, ListOfListsType),
         filterRows = Table.SelectRows(appliedSchema, each [is_public] = public),
         renameCols = Table.RenameColumns(filterRows, {{"id", "Key"}}),
@@ -453,7 +453,7 @@ CreateListsNavTable = (listType as text, public as logical, listHandler as funct
     in
         NavTable;
 
-CauseSolution.Feed = (url as text, hasNextLink as logical, optional schema as type, optional limit as number) as table => 
+Blackbaud.Feed = (url as text, hasNextLink as logical, optional schema as type, optional limit as number) as table => 
     if hasNextLink then 
         GetAllPagesByNextLink(url, schema) 
     else 
@@ -469,7 +469,7 @@ GetEntity = (url as text, entity as text) as table =>
         schema = GetSchemaForEntity(entity),
         modifier = GetModifierForEntity(entity),
         hasNextLink = GetHasNextLinkForEntity(entity),
-        data = CauseSolution.Feed(fullUrl, hasNextLink, schema, limit),
+        data = Blackbaud.Feed(fullUrl, hasNextLink, schema, limit),
         appliedSchema = if (schema <> null) then Table.ChangeType(data, schema) else data,
         result = if (modifier <> null) then
             modifier(appliedSchema)
@@ -832,7 +832,7 @@ ConstituentFiltered = (optional constituentCode as text, optional customFieldCat
         urlFundraiser = urlInactive & (if (fundraiserStatus <> null) then "&fundraiser_status=" & fundraiserStatus else ""),
         urlConstitCode = urlFundraiser & AddMultipleQueryStringValues("constituent_code", constituentCode),
         urlCustomField = urlConstitCode & AddMultipleQueryStringValues("custom_field_category", customFieldCategory),
-        data = CauseSolution.Feed(urlCustomField, true, ConstituentListType, limit),
+        data = Blackbaud.Feed(urlCustomField, true, ConstituentListType, limit),
         appliedSchema = Table.ChangeType(data, ConstituentListType),
         result = ConstituentLayout(appliedSchema)
     in
@@ -843,7 +843,7 @@ ConstituentByList = (listId as text) as table =>
         limit = DefaultRecLimit,
         url = Uri.Combine(BaseUrl, urlConstitList & "?limit=" & Number.ToText(limit)),
         urlListId = url & "&list_id=" & listId,
-        data = CauseSolution.Feed(urlListId, true, ConstituentListType, limit),
+        data = Blackbaud.Feed(urlListId, true, ConstituentListType, limit),
         appliedSchema = Table.ChangeType(data, ConstituentListType),
         result = ConstituentLayout(appliedSchema)
     in
@@ -1293,7 +1293,7 @@ GiftByList = (listId as text) as table =>
         limit = DefaultRecLimit,
         url = Uri.Combine(BaseUrl, urlGiftList & "?limit=" & Number.ToText(limit)),
         urlListId = url & "&list_id=" & listId,
-        data = CauseSolution.Feed(urlListId, true, GiftListType, limit),
+        data = Blackbaud.Feed(urlListId, true, GiftListType, limit),
         appliedSchema = Table.ChangeType(data, GiftListType),
         result = GiftLayout(appliedSchema)
     in
@@ -1513,15 +1513,15 @@ PackageListType = type table [
                                         idTable = Table.FromList(idList, Record.FieldValues, {"Proj","Acct"}),
                                         qsTable = Table.AddColumn(Table.ExpandListColumn(idTable, "Acct"), "QueryString", each "&ui_project_id=" & [Proj] & "&account_number=" & [Acct]),
                                         qsList = Table.ToList(Table.RemoveColumns(qsTable, {"Proj","Acct"})),
-                                        resultList = List.Transform(qsList, each CauseSolution.Feed(urlAccountNumber & _, false, TransactionDistributionListType, limit))
+                                        resultList = List.Transform(qsList, each Blackbaud.Feed(urlAccountNumber & _, false, TransactionDistributionListType, limit))
                                     in
                                         resultList
                                 else
-                                    List.Transform(projectIdList, each CauseSolution.Feed(urlAccountNumber & "&ui_project_id=" & _, false, TransactionDistributionListType, limit))
+                                    List.Transform(projectIdList, each Blackbaud.Feed(urlAccountNumber & "&ui_project_id=" & _, false, TransactionDistributionListType, limit))
                             else if List.Count(accountNumberList) > 1 then
-                                List.Transform(accountNumberList, each CauseSolution.Feed(urlAccountNumber & "&account_number=" & _, false, TransactionDistributionListType, limit))
+                                List.Transform(accountNumberList, each Blackbaud.Feed(urlAccountNumber & "&account_number=" & _, false, TransactionDistributionListType, limit))
                             else
-                                {CauseSolution.Feed(urlAccountNumber, false, TransactionDistributionListType, limit)},
+                                {Blackbaud.Feed(urlAccountNumber, false, TransactionDistributionListType, limit)},
                         appliedSchema = Table.ChangeType(Table.Combine(dataList), TransactionDistributionListType)
                     in
                         TransactionDistributionLayout(appliedSchema)
@@ -1563,7 +1563,7 @@ PackageListType = type table [
         let
             url = Uri.Combine(BaseUrl, Text.Format(urlBudget, {Number.ToText(scenarioId)})),
             // Passing in true for the hasNextLink parameter below because a count value is returned in the response BUT the endpoint does not support limit/offset
-            data = CauseSolution.Feed(url, true, BudgetType),
+            data = Blackbaud.Feed(url, true, BudgetType),
             appliedSchema = Table.ChangeType(data, BudgetType),
             addId = Table.AddColumn(appliedSchema, "budget_scenario_id", each scenarioId, Int32.Type)
         in
@@ -1642,7 +1642,7 @@ BudgetDetailFiltered = (scenarioId as number, optional catch404 as logical) as t
 BudgetDetailFilteredWithIdCol = (scenarioId as number, optional catch404 as logical) as table =>
         let
             url = Uri.Combine(BaseUrl, Text.Format(urlBudgetDetail, {Number.ToText(scenarioId)})),
-            data = try CauseSolution.Feed(url, false, BudgetDetailType),
+            data = try Blackbaud.Feed(url, false, BudgetDetailType),
             errorCheck =
                 if data[HasError] then
                     if catch404 <> null and catch404 and Text.Contains(data[Error][Message], "(404)") then
@@ -1710,7 +1710,7 @@ BudgetDetailFilteredWithIdCol = (scenarioId as number, optional catch404 as logi
         let
             limit = DefaultRecLimit,
             url = Uri.Combine(BaseUrl, Text.Format(urlBudgetDetailLinesList, {Number.ToText(scenarioId)}) & "?limit=" & Number.ToText(limit)),
-            data = CauseSolution.Feed(url, false, BudgetDetailLinesListType, limit),
+            data = Blackbaud.Feed(url, false, BudgetDetailLinesListType, limit),
             appliedSchema = Table.ChangeType(data, BudgetDetailLinesListType),
             addBudgetScenarioId = Table.AddColumn(appliedSchema, "budget_scenario_id", each scenarioId, Int32.Type),
             result = BudgetDetailLinesListLayout(addBudgetScenarioId)
@@ -1916,7 +1916,7 @@ EventCategoryType = type [
 LoadTableForSingleRec = (recId as text, route as text, optional tableType as type) as table =>
     let
         fullUrl = Uri.Combine(BaseUrl, Text.Format(route, {recId})),
-        result = CauseSolution.Feed(fullUrl, tableType),
+        result = Blackbaud.Feed(fullUrl, tableType),
         appliedSchema = Table.ChangeType(result, tableType)
     in
         appliedSchema;

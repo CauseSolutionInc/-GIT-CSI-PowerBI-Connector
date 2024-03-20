@@ -1,4 +1,4 @@
-<Project DefaultTargets="BuildExtension" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="BuildExtension" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
@@ -18,7 +18,7 @@
     <SuppressCellErrors>False</SuppressCellErrors>
     <MaxRows>1000</MaxRows>
     <ExtensionProject>Yes</ExtensionProject>
-    <Name>CauseSolution</Name>
+    <Name>Cause and Solution</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>false</DebugSymbols>
@@ -36,7 +36,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CauseSolution.pq">
+    <Compile Include="Blackbaud.pq">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CauseSolution16.png">
@@ -66,7 +66,7 @@
     <Compile Include="resources.resx">
       <SubType>Code</SubType>
     </Compile>
-    <Content Include="CauseSolution.query.pq">
+    <Content Include="BlackBaud.query.pq">
       <SubType>Code</SubType>
     </Content>
     <Compile Include="client_id.txt">
